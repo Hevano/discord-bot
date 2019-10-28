@@ -15,10 +15,11 @@
   "author": "Gabriel Tanner",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^11.4.2",
+    "discord.js": "^11.5.1",
     "ffmpeg": "0.0.4",
     "ffmpeg-binaries": "^4.0.0",
     "opusscript": "0.0.6",
-    "ytdl-core": "^0.29.1"
+    "ytdl-core": "^0.29.7",
+    "ytpl": "^0.1.17"
   }
 }

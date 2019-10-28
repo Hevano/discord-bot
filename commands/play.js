@@ -2,6 +2,7 @@ const {
 	Util
 } = require('discord.js');
 const ytdl = require('ytdl-core');
+const ytpl = require('ytpl');
 
 module.exports = {
 	name: 'play',
@@ -18,38 +19,87 @@ module.exports = {
 			return message.channel.send('I need the permissions to join and speak in your voice channel!');
 		}
 
-		const songInfo = await ytdl.getInfo(args[1]);
-		const song = {
-			title: songInfo.title,
-			url: songInfo.video_url,
-		};
 
-		if (!serverQueue) {
-			const queueContruct = {
-				textChannel: message.channel,
-				voiceChannel: voiceChannel,
-				connection: null,
-				songs: [],
-				volume: 5,
-				playing: true,
-			};
+		//Identify if args is a yt playlist url, and if so do differnt logic
+		if(ytpl.validateURL(args[1])){
+			//playlist logic
+			const playlistInfo = await ytpl(args[1], 0);
 
-			queue.set(message.guild.id, queueContruct);
+			if (!serverQueue) {
+				const queueContruct = {
+					textChannel: message.channel,
+					voiceChannel: voiceChannel,
+					connection: null,
+					songs: [],
+					volume: 5,
+					playing: true,
+				};
 
-			queueContruct.songs.push(song);
+				queue.set(message.guild.id, queueContruct);
 
-			try {
-				var connection = await voiceChannel.join();
-				queueContruct.connection = connection;
-				this.play(message, queueContruct.songs[0]);
-			} catch (err) {
-				console.log(err);
-				queue.delete(message.guild.id);
-				return message.channel.send(err);
+				for(playListItem of playlistInfo.items){
+					const song = {
+						title: playListItem.title,
+						url: playListItem.url_simple,
+					};
+					queueContruct.songs.push(song);
+				}
+
+				try {
+					var connection = await voiceChannel.join();
+					queueContruct.connection = connection;
+					this.play(message, queueContruct.songs[0]);
+				} catch (err) {
+					console.log(err);
+					queue.delete(message.guild.id);
+					return message.channel.send(err);
+				}
+			} else {
+				for(playListItem of playlistInfo.items){
+					const song = {
+						title: playListItem.title,
+						url: playListItem.url_simple,
+					};
+					serverQueue.songs.push(song);
+				}
+				
+				return message.channel.send(`${playlistInfo.title} has been added to the queue! (${playlistInfo.total_items} added)`);
 			}
 		} else {
-			serverQueue.songs.push(song);
-			return message.channel.send(`${song.title} has been added to the queue!`);
+			//single song logic
+			const songInfo = await ytdl.getInfo(args[1]);
+			const song = {
+				title: songInfo.title,
+				url: songInfo.video_url,
+			};
+
+			if (!serverQueue) {
+				const queueContruct = {
+					textChannel: message.channel,
+					voiceChannel: voiceChannel,
+					connection: null,
+					songs: [],
+					volume: 5,
+					playing: true,
+				};
+
+				queue.set(message.guild.id, queueContruct);
+
+				queueContruct.songs.push(song);
+
+				try {
+					var connection = await voiceChannel.join();
+					queueContruct.connection = connection;
+					this.play(message, queueContruct.songs[0]);
+				} catch (err) {
+					console.log(err);
+					queue.delete(message.guild.id);
+					return message.channel.send(err);
+				}
+			} else {
+				serverQueue.songs.push(song);
+				return message.channel.send(`${song.title} has been added to the queue!`);
+			}
 		}
 	},
 
