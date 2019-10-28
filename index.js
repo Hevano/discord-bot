@@ -1,10 +1,6 @@
 const fs = require('fs')
 const Discord = require('discord.js');
 const Client = require('./client/Client');
-const {
-	prefix,
-	token,
-} = require('./config.json');
 
 const client = new Client();
 client.commands = new Discord.Collection();
@@ -38,7 +34,7 @@ client.on('message', async message => {
 	const command = client.commands.get(commandName);
 
 	if (message.author.bot) return;
-	if (!message.content.startsWith(prefix)) return;
+	if (!message.content.startsWith('`')) return;
 
 	try {
 		command.execute(message);
