@@ -7,7 +7,7 @@ const themes = require('../themes.json');
 
 module.exports = {
 	name: 'theme',
-	description: 'Play a character\'s theme in your channel!',
+	description: 'Play a character\'s theme in your channel! Skips the currently playing song',
 	async execute(message) {
 		const args = message.content.split(' ');
 		const queue = message.client.queue;
@@ -48,6 +48,7 @@ module.exports = {
 			try {
 				var connection = await voiceChannel.join();
 				queueContruct.connection = connection;
+				message.channel.send(`Now playing ${args[1]}'s theme!`);
 				this.play(message, queueContruct.songs[0]);
 			} catch (err) {
 				console.log(err);
@@ -55,8 +56,9 @@ module.exports = {
 				return message.channel.send(err);
 			}
 		} else {
-			serverQueue.songs.push(song);
-			return message.channel.send(`${song.title} has been added to the queue!`);
+			serverQueue.songs.unshift(song);
+			serverQueue.connection.dispatcher.end();
+			return message.channel.send(`Now playing ${args[1]}'s theme!`);
 		}
 	},
 
