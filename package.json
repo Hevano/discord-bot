@@ -1,9 +1,12 @@
 {
   "name": "music-bot",
   "version": "1.0.0",
-  "repository": "https://github.com/TannerGabriel/discord-music-bot.git",
+  "repository": "https://github.com/Hevano/discord-bot.git",
   "description": "A simple discord music bot",
   "main": "index.js",
+  "engines": {
+    "node": "8.12.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,7 +15,7 @@
     "music",
     "bot"
   ],
-  "author": "Gabriel Tanner",
+  "author": "Evano Hirabe",
   "license": "MIT",
   "dependencies": {
     "discord.js": "^11.5.1",
